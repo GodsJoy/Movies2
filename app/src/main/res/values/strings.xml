@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Movies</string>
+    <string name="details_name">Movie Details</string>
+
+    <string name="popular">popular</string>
+    <string name="top_rated">top_rated</string>
+
+    <string name="popular_s">Popular</string>
+    <string name="top_rated_s">Top rated</string>
+
+    <string name="original_title">Original Title : </string>
+    <string name="synopsis">Synopsis</string>
+    <string name="poster">Movie Poster</string>
+    <string name="release_date">Release Date : </string>
+    <string name="vote_average">Vote Average : </string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="sort_order_title">Sort Option</string>
+
+    <string name="video">videos</string>
+    <string name="review">reviews</string>
+
+    <string name="fav">Mark as favorite</string>
+
+</resources>

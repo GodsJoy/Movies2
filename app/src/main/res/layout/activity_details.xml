@@ -47,6 +47,7 @@
             style="@style/DetailsTheme"/>
 
         <Button
+            android:id="@+id/favBtn"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="@string/fav"
@@ -65,6 +66,7 @@
             android:layout_marginRight="16dp"/>
 
         <View
+            android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@id/synopsisTV"
@@ -74,9 +76,50 @@
             android:background="#000000" />
         
         <TextView
+            android:id="@+id/trailer_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Trailers:"/>
+            android:layout_below="@id/divider"
+            android:text="Trailers:"
+            android:textSize="32sp"
+            android:textColor="#000000"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_trailer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingBottom="2dp"
+            android:layout_below="@id/trailer_tv"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"/>
+
+        <TextView
+            android:id="@+id/review_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reviews:"
+            android:textSize="32sp"
+            android:textColor="#000000"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_below="@id/recyclerview_trailer"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingBottom="2dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_below="@id/review_tv"/>
         
 
 

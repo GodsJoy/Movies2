@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
                 try{
                     String result = NetworkUtil.getResponseFromHttpUrl(movies);
                     //return processed array of Movies
-                    Log.d("loadINBackground", result+"here");
+                    //Log.d("loadINBackground", result+"here");
                     return CreateMoviesFromResponseUtil.getEachMovie(result);
                 }
                 catch (Exception e){
@@ -242,6 +242,11 @@ public class MainActivity extends AppCompatActivity implements
             searchMovies(getString(R.string.top_rated));
             return true;
         }
+        if (id == R.id.fav_menu){
+            Intent intent = new Intent(MainActivity.this, Favorites.class);
+            startActivity(intent);
+        }
+
 
         return super.onOptionsItemSelected(item);
     }

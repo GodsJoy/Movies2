@@ -38,6 +38,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     @Override
     public MoviesAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d("ViewTYPE", viewType+" viewtype");
         int layoutID = R.layout.movies_list;
         View view = LayoutInflater.from(parent.getContext()).inflate(layoutID, parent, false);
         return new MoviesAdapterViewHolder(view);
@@ -85,11 +86,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
             return 0;
         else
             return allMovies.length;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
     }
 
     public void setMoviesData(Movie [] moviesData){

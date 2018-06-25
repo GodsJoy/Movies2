@@ -4,6 +4,7 @@ import android.app.LoaderManager;
 import android.util.Log;
 
 import com.example.android.movies2.models.Movie;
+import com.example.android.movies2.models.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +66,61 @@ public class CreateMoviesFromResponseUtil {
             return null;
         }
 
+    }
+
+    public static String [] getEachTrailer(String trailerJSON){
+        try {
+            if (trailerJSON != null) {
+                //crete a JSONObject from the raw JSON result
+                JSONObject trailers = new JSONObject(trailerJSON);
+
+                //get results field which describes each trailer in a page
+                JSONArray trailersResult = trailers.getJSONArray("results");
+
+                //create an array of movie with lenght of movies in moviesResult
+                String[] allTrailers = new String[trailersResult.length()];
+
+                for(int i = 0; i < allTrailers.length; i++){
+                    JSONObject amovie = trailersResult.getJSONObject(i);
+                    allTrailers[i] = amovie.getString("key");
+                }
+                return allTrailers;
+            }
+            return null;
+        }
+        catch (JSONException j){
+            return null;
+        }
+    }
+
+    public static Review[] getEachReview(String reviewJSON){
+        try {
+            if (reviewJSON != null) {
+                //crete a JSONObject from the raw JSON result
+                JSONObject reviews = new JSONObject(reviewJSON);
+
+                //get results field which describes each trailer in a page
+                JSONArray reviewsResult = reviews.getJSONArray("results");
+
+                //create an array of movie with lenght of movies in moviesResult
+                Review[] allReviews = new Review[reviewsResult.length()];
+
+                String author = "";
+                String content = "";
+
+                for(int i = 0; i < allReviews.length; i++){
+                    JSONObject areview = reviewsResult.getJSONObject(i);
+                    author = areview.getString("author");
+                    content = areview.getString("content");
+                    allReviews[i] = new Review(author, content);
+                }
+                return allReviews;
+            }
+            return null;
+        }
+        catch (JSONException j){
+            return null;
+        }
     }
 
 }

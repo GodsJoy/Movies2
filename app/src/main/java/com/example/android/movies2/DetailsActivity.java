@@ -1,25 +1,39 @@
 package com.example.android.movies2;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.movies2.database.AppDatabase;
+import com.example.android.movies2.database.MovieEntry;
 import com.example.android.movies2.models.Movie;
+import com.example.android.movies2.models.Review;
+import com.example.android.movies2.utility.CreateMoviesFromResponseUtil;
 import com.example.android.movies2.utility.NetworkUtil;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 
 public class DetailsActivity extends AppCompatActivity implements
-        LoaderCallbacks<String []> {
+        LoaderCallbacks<String>,
+        TrailersAdapter.TrailersAdapterOnClickListener{
 
     //used as tag for extra in intent
     public static final String EXTRA_POSITION = "extra_position";
@@ -33,17 +47,30 @@ public class DetailsActivity extends AppCompatActivity implements
     private ImageView mPosterIV;
     private TextView mVoteAVGTV;
     private TextView mSynopsisTV;
+    private Button mFavBtn;
+
+    private boolean movieInFav = false;
+
+    private RecyclerView mRecyclerViewTrailer;
+    private RecyclerView mRecyclerViewReview;
+    private TrailersAdapter mTrailerAdapter;
+    private ReviewsAdapter mReviewAdapter;
+
+    private AppDatabase mDb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mTitleTV = (TextView) findViewById(R.id.titleTV);
         mReleaseDateTV = (TextView) findViewById(R.id.releaseDateTV);
         mPosterIV = (ImageView) findViewById(R.id.posterIV);
         mVoteAVGTV = (TextView) findViewById(R.id.voteAVGTV);
         mSynopsisTV = (TextView) findViewById(R.id.synopsisTV);
+        mFavBtn = (Button) findViewById(R.id.favBtn);
 
+
+        mDb = AppDatabase.getsInstance(getApplicationContext());
         //get intent used to launch this class
         //Reference : SandWich project in this Phase
         Intent intent = getIntent();
@@ -53,24 +80,75 @@ public class DetailsActivity extends AppCompatActivity implements
         }
 
         //get extra data from intent which is a Movie object
-        Movie m = intent.getParcelableExtra(EXTRA_POSITION);
+        final Movie m = intent.getParcelableExtra(EXTRA_POSITION);
         if(m == null){
             //close app if object is null
             closeAndReportError();
             return;
         }
 
-        getOtherDetailsFromServer(m.getId(), getString(R.string.video));
-        getOtherDetailsFromServer(m.getId(), getString(R.string.review));
 
         //populate activity_details using Movie data
         //Reference : SandWich project in this Phase
         populateDetails(m);
         setTitle(getString(R.string.details_name));
+        //set onclicklistener for button to mark as favorite
+        mFavBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onMarkButtonClicked(m);
+            }
+        });
+
+        setAsFav(m.getId());
+
+        //Prepare Review Recyclerview
+        mRecyclerViewTrailer = (RecyclerView) findViewById(R.id.recyclerview_trailer);
+        RecyclerView.LayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerViewTrailer.setLayoutManager(layoutManager);
+        mRecyclerViewTrailer.setHasFixedSize(true);
+        mTrailerAdapter = new TrailersAdapter(this, this);
+        mRecyclerViewTrailer.setAdapter(mTrailerAdapter);
+
+        //Prepare Reviews Recyclerview
+        mRecyclerViewReview = (RecyclerView) findViewById(R.id.recyclerview_review);
+        layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerViewReview.setLayoutManager(layoutManager);
+        mRecyclerViewReview.setHasFixedSize(true);
+        mReviewAdapter = new ReviewsAdapter(this);
+        mRecyclerViewReview.setAdapter(mReviewAdapter);
+
+        getOtherDetailsFromServer(m.getId(), getString(R.string.video));
+        getOtherDetailsFromServer(m.getId(), getString(R.string.review));
+
+
+
+    }
+
+    private void setAsFav(String movieId){
+        DetailsViewModelFactory factory = new DetailsViewModelFactory(mDb, movieId);
+        final DetailsViewModel viewModel = ViewModelProviders.of(this, factory).get(DetailsViewModel.class);
+        viewModel.getMovie().observe(this, new Observer<MovieEntry>() {
+            @Override
+            public void onChanged(@Nullable MovieEntry movieEntry) {
+                viewModel.getMovie().removeObserver(this);
+                if(movieEntry != null){
+                    Log.d("setasfav", "already in db");
+                    movieInFav = true;
+                    mFavBtn.setText(R.string.unfav);
+                }
+                else{
+                    Log.d("setasfav", "not found in db");
+                }
+
+            }
+        });
     }
 
     private void getOtherDetailsFromServer(String movie_id, String which){
-        LoaderCallbacks<String[]> callback = DetailsActivity.this;
+        LoaderCallbacks<String> callback = DetailsActivity.this;
 
         Bundle loaderBundle = new Bundle();
         loaderBundle.putCharSequence("movie_id", movie_id);
@@ -93,6 +171,28 @@ public class DetailsActivity extends AppCompatActivity implements
         mSynopsisTV.setText(m.getSynopsis());
     }
 
+    public void onMarkButtonClicked(final Movie m){
+        //String originalTitle, String posterPath, String synopsis, float rating, String releaseDate
+        final MovieEntry movie = new MovieEntry(m.getId(), m.getOriginalTitle(),
+                m.getposterPath(), m.getSynopsis(), m.getRating(),
+                m.getReleaseDate());
+        AppExecutor.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if(movieInFav){
+                    mDb.movieDao().deleteMovie(movie);
+                    mFavBtn.setText(R.string.fav);
+                    movieInFav = false;
+                }
+                else{
+                    mDb.movieDao().insertMovie(movie);
+                    mFavBtn.setText(R.string.unfav);
+                    movieInFav = true;
+                }
+            }
+        });
+    }
+
     //Reference : SandWich project in this Phase
     private void closeAndReportError(){
         finish();
@@ -100,10 +200,10 @@ public class DetailsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<String[]> onCreateLoader(int id, final Bundle args) {
-        Log.d("DetailsBackground", "got here1");
-        return new AsyncTaskLoader<String[]>(this) {
-            String [] result = null;
+    public Loader<String> onCreateLoader(int id, final Bundle args) {
+        //Log.d("DetailsBackground", "got here1");
+        return new AsyncTaskLoader<String>(this) {
+            String result = null;
             @Override
             protected void onStartLoading() {
                 if(result != null){
@@ -115,39 +215,62 @@ public class DetailsActivity extends AppCompatActivity implements
             }
 
             @Override
-            public String[] loadInBackground() {
+            public String loadInBackground() {
                 //Log.d("DetailsBackground", "got here");
                 URL videos = NetworkUtil.buildVideoOrReviewUrl(args.getString("movie_id"), args.getString("which"));
                 //URL reviews = NetworkUtil.buildVideoOrReviewUrl(args.getString("movie_id"), "reviews");
                 //Log.d("DetailsBackground", videos.toString());
                 try{
-                    String videosResult = NetworkUtil.getResponseFromHttpUrl(videos);
+                    String result = NetworkUtil.getResponseFromHttpUrl(videos);
                     //String reviewsResult = NetworkUtil.getResponseFromHttpUrl(reviews);
-                    Log.d(args.getString("which")+"Result", videosResult+"video");
-                    //Log.d("ReviewResult", reviewsResult+"review");
-                    return new String[0];
+                    //Log.d(args.getString("which")+"Result", result+"video");
+                    Log.d("Result", args.getString("which")+result);
+                    return result;
                 }
                 catch (Exception e){
-                    Log.d("VRhttp", "Error while get videos and reviews");
+                    //Log.d("VRhttp", "Error while get videos and reviews");
                     return null;
                 }
 
             }
 
-            public void deliverResult(String [] movies){
-                super.deliverResult(movies);
+            public void deliverResult(String result){
+                super.deliverResult(result);
             }
         };
     }
 
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] data) {
-        //Log.d("Finish", "finish");
-        Log.d("LoaderID", "ID: "+loader.getId());
+    public void onLoadFinished(Loader<String> loader, String data) {
+        if(loader.getId() == VIDEO_LOADER_ID){
+            mTrailerAdapter.setTrailerData(CreateMoviesFromResponseUtil.getEachTrailer(data));
+        }
+        else if(loader.getId() == REVIEW_LOADER_ID){
+            mReviewAdapter.setReviewsData(CreateMoviesFromResponseUtil.getEachReview(data));
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<String[]> loader) {
+    public void onLoaderReset(Loader<String> loader) {
 
     }
+
+    @Override
+    public void onClickTrailer(String trailerKey) {
+        String id = "http://www.youtube.com/watch?v="+trailerKey;
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(id));
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }

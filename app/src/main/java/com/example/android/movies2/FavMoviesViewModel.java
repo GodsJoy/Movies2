@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Created by ayomide on 6/25/18.
  */
+/*Reference: Android Architecture Components lesson*/
 public class FavMoviesViewModel extends AndroidViewModel {
 
     private LiveData<List<MovieEntry>> movies;

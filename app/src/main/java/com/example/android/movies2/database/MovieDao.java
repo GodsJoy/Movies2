@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by ayomide on 6/25/18.
  */
+/*Reference: Android Architecture Components lesson*/
 @Dao
 public interface MovieDao {
 

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 /**
  * Created by ayomide on 6/25/18.
  */
+/*Reference: Android Architecture Components lesson*/
 @Entity(tableName = "movie")
 public class MovieEntry {
     @PrimaryKey

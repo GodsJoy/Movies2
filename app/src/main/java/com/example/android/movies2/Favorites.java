@@ -51,6 +51,7 @@ public class Favorites extends AppCompatActivity implements
     }
 
     //processes viewmodel and update adapter with movies retrieved from database
+    /*Reference: Android Architecture Components lesson*/
     private void processFavMoviesViewModel(){
         FavMoviesViewModel viewModel = ViewModelProviders.of(this).get(FavMoviesViewModel.class);
         viewModel.getMovies().observe(this, new Observer<List<MovieEntry>>() {

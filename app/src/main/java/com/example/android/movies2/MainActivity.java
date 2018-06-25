@@ -169,42 +169,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    //method to populate the spinner
-    /*Reference : https://developer.android.com/guide/topics/ui/controls/spinner,
-    * https://www.tutorialspoint.com/android/android_spinner_control.htm,
-    * https://developer.android.com/guide/topics/ui/controls/spinner*/
-    /*private void populateSpinner(){
-
-        spinner.setOnItemSelectedListener(this);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.sort_options, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }*/
-
-    //method that gets called when a Spinner item is selected
-    /*Reference : https://developer.android.com/guide/topics/ui/controls/spinner,
-    * https://www.tutorialspoint.com/android/android_spinner_control.htm,
-    * https://developer.android.com/guide/topics/ui/controls/spinner*/
-    /*@Override
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        String selectedOption = (String) parent.getItemAtPosition(pos);
-
-        if (sortOptionSelected) {
-            if(!selectedOption.equals(currentlySelectedSortOrder)) {
-                if (selectedOption.equals(getResources().getStringArray(R.array.sort_options)[0])) {
-                    searchMovies(getString(R.string.popular));
-                } else {
-                    searchMovies(getString(R.string.top_rated));
-                }
-            }
-
-        } else {
-            sortOptionSelected = true;
-        }
-        currentlySelectedSortOrder = selectedOption;
-
-    }*/
 
     @Override
     public void onClick(Movie clickedMovie){

@@ -9,6 +9,7 @@ import com.example.android.movies2.database.MovieEntry;
 /**
  * Created by ayomide on 6/25/18.
  */
+
 public class DetailsViewModel extends ViewModel {
     private LiveData<MovieEntry> movie;
 

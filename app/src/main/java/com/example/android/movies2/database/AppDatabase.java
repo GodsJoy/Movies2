@@ -8,6 +8,7 @@ import android.content.Context;
 /**
  * Created by ayomide on 6/25/18.
  */
+//database for favorite movies
 @Database(entities = {MovieEntry.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();

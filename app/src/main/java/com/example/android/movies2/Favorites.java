@@ -18,9 +18,12 @@ import java.util.List;
 
 public class Favorites extends AppCompatActivity implements
         MoviesAdapter.MoviesAdapterOnClickHandler{
+
+    //movie recyclerview and adapter
     private RecyclerView mRecyclerView;
     private MoviesAdapter mMovieAdapter;
 
+    //database from which favorite movies are retrieved
     private AppDatabase mDb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +44,13 @@ public class Favorites extends AppCompatActivity implements
         mRecyclerView.setAdapter(mMovieAdapter);
 
         mDb = AppDatabase.getsInstance(getApplicationContext());
+
+
         processFavMoviesViewModel();
 
     }
 
+    //processes viewmodel and update adapter with movies retrieved from database
     private void processFavMoviesViewModel(){
         FavMoviesViewModel viewModel = ViewModelProviders.of(this).get(FavMoviesViewModel.class);
         viewModel.getMovies().observe(this, new Observer<List<MovieEntry>>() {

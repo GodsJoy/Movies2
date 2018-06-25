@@ -77,7 +77,7 @@ public class CreateMoviesFromResponseUtil {
                 //get results field which describes each trailer in a page
                 JSONArray trailersResult = trailers.getJSONArray("results");
 
-                //create an array of movie with lenght of movies in moviesResult
+                //create an array of trailerURLs with lenght of trailersResult
                 String[] allTrailers = new String[trailersResult.length()];
 
                 for(int i = 0; i < allTrailers.length; i++){
@@ -99,10 +99,10 @@ public class CreateMoviesFromResponseUtil {
                 //crete a JSONObject from the raw JSON result
                 JSONObject reviews = new JSONObject(reviewJSON);
 
-                //get results field which describes each trailer in a page
+                //get results field which describes each review in a page
                 JSONArray reviewsResult = reviews.getJSONArray("results");
 
-                //create an array of movie with lenght of movies in moviesResult
+                //create an array of reviews with lenght of reviews in ReviewsResult
                 Review[] allReviews = new Review[reviewsResult.length()];
 
                 String author = "";

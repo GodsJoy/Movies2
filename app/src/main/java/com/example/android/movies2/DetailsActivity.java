@@ -51,11 +51,13 @@ public class DetailsActivity extends AppCompatActivity implements
 
     private boolean movieInFav = false;
 
+    //Recyclerviews and adapters for trailers and reviews
     private RecyclerView mRecyclerViewTrailer;
     private RecyclerView mRecyclerViewReview;
     private TrailersAdapter mTrailerAdapter;
     private ReviewsAdapter mReviewAdapter;
 
+    //database to insert movies into favourite database
     private AppDatabase mDb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +71,7 @@ public class DetailsActivity extends AppCompatActivity implements
         mSynopsisTV = (TextView) findViewById(R.id.synopsisTV);
         mFavBtn = (Button) findViewById(R.id.favBtn);
 
-
+        //instantiate database
         mDb = AppDatabase.getsInstance(getApplicationContext());
         //get intent used to launch this class
         //Reference : SandWich project in this Phase
@@ -92,6 +94,7 @@ public class DetailsActivity extends AppCompatActivity implements
         //Reference : SandWich project in this Phase
         populateDetails(m);
         setTitle(getString(R.string.details_name));
+
         //set onclicklistener for button to mark as favorite
         mFavBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +103,7 @@ public class DetailsActivity extends AppCompatActivity implements
             }
         });
 
+        //check if this movie is already in the database.
         setAsFav(m.getId());
 
         //Prepare Review Recyclerview
@@ -127,6 +131,7 @@ public class DetailsActivity extends AppCompatActivity implements
 
     }
 
+    //checks if movie has already been marked as favorite
     private void setAsFav(String movieId){
         DetailsViewModelFactory factory = new DetailsViewModelFactory(mDb, movieId);
         final DetailsViewModel viewModel = ViewModelProviders.of(this, factory).get(DetailsViewModel.class);
@@ -135,12 +140,8 @@ public class DetailsActivity extends AppCompatActivity implements
             public void onChanged(@Nullable MovieEntry movieEntry) {
                 viewModel.getMovie().removeObserver(this);
                 if(movieEntry != null){
-                    Log.d("setasfav", "already in db");
                     movieInFav = true;
                     mFavBtn.setText(R.string.unfav);
-                }
-                else{
-                    Log.d("setasfav", "not found in db");
                 }
 
             }
@@ -171,6 +172,8 @@ public class DetailsActivity extends AppCompatActivity implements
         mSynopsisTV.setText(m.getSynopsis());
     }
 
+    //insert favorite movie into database if it is not already present
+    //delete movie from database if it is already present
     public void onMarkButtonClicked(final Movie m){
         //String originalTitle, String posterPath, String synopsis, float rating, String releaseDate
         final MovieEntry movie = new MovieEntry(m.getId(), m.getOriginalTitle(),

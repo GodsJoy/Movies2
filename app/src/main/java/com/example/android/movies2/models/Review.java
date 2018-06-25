@@ -3,6 +3,7 @@ package com.example.android.movies2.models;
 /**
  * Created by ayomide on 6/24/18.
  */
+//POJO for review. A review has an author and content
 public class Review {
     private String mAuthor;
     private String mContent;
